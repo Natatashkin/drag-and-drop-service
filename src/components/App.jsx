@@ -12,8 +12,22 @@ import { FavoriteVideoList } from './FavotiteVideoList';
 
 export const App = () => {
   const { videos } = useGetVideos();
+  const [popularVideos, setPopularVideos] = useState([]);
+  const [favoriteVideos, setFavoriteVideos] = useState([]);
 
-  const handleOnDragEnd = () => {};
+  useEffect(() => {
+    setPopularVideos(videos);
+  }, [videos]);
+
+  const handleOnDragEnd = result => {
+    console.log(result);
+    if (!result.destination) return;
+    const items = Array.from(popularVideos);
+    const [reorderedVideo] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedVideo);
+
+    setPopularVideos(items);
+  };
 
   return (
     <StylesProvider jss={jss} generateClassName={generateClassName}>
@@ -21,8 +35,8 @@ export const App = () => {
         <Container>
           <DragDropContext onDragEnd={handleOnDragEnd}>
             <VideoList>
-              {videos &&
-                videos.map((video, index) => (
+              {popularVideos &&
+                popularVideos.map((video, index) => (
                   <VideoListItem key={video.id} video={video} index={index} />
                 ))}
             </VideoList>
