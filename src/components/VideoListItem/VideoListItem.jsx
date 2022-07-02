@@ -1,8 +1,9 @@
-import ListItem from '@mui/material/ListItem';
+import { Draggable } from 'react-beautiful-dnd';
 import { useRef, useEffect } from 'react';
 import { useStyles } from './VideoListItem.styles';
+import ListItem from '@mui/material/ListItem';
 
-const VideoListItem = ({ video }) => {
+const VideoListItem = ({ video, index }) => {
   const ref = useRef(null);
   const { id, snippet = {}, player = {} } = video;
   const { thumbnails = {}, title } = snippet;
@@ -16,10 +17,19 @@ const VideoListItem = ({ video }) => {
   }, [embedHtml]);
 
   return (
-    <ListItem classes={{ root: s.li }}>
-      <div ref={ref}></div>
-      <p>{title}</p>
-    </ListItem>
+    <Draggable draggableId={id} index={index}>
+      {provided => (
+        <ListItem
+          ref={provided.innerRef}
+          classes={{ root: s.li }}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+        >
+          <div ref={ref}></div>
+          <p>{title}</p>
+        </ListItem>
+      )}
+    </Draggable>
   );
 };
 

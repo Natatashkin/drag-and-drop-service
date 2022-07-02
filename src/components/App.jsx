@@ -7,7 +7,7 @@ import {
 } from '@mui/styles';
 import { create } from 'jss';
 import jssIncreaseSpecificity from 'jss-increase-specificity';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { DragDropContext } from 'react-beautiful-dnd';
 import { useGetVideos } from 'hooks/useGetVideos';
 import { Container } from './Container';
 import { VideoList } from './VideoList';
@@ -31,34 +31,12 @@ export const App = () => {
     <StylesProvider jss={jss} generateClassName={generateClassName}>
       <Container>
         <DragDropContext>
-          <Droppable droppableId="videos">
-            {provided => (
-              <VideoList {...provided.droppableProps} ref={provided.innerRef}>
-                {Boolean(videos?.length) &&
-                  videos.map((video, index) => {
-                    return (
-                      <Draggable
-                        key={video.id}
-                        draggableId={video.id}
-                        index={index}
-                      >
-                        {provided => (
-                          <VideoListItem
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            video={video}
-                          />
-                        )}
-                      </Draggable>
-                    );
-                  })}
-              </VideoList>
-            )}
-          </Droppable>
-          {/* <Droppable> */}
-          {/* <FavoriteVideoList ref={favoriteRef}></FavoriteVideoList> */}
-          {/* </Droppable> */}
+          <VideoList>
+            {videos &&
+              videos.map((video, index) => (
+                <VideoListItem video={video} index={index} />
+              ))}
+          </VideoList>
         </DragDropContext>
       </Container>
     </StylesProvider>
