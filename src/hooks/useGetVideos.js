@@ -8,7 +8,6 @@ export const useGetVideos = () => {
   const getPopularVideos = useCallback(async () => {
     try {
       const response = await youtubeAPI.getVideos();
-      console.log(response);
       setVideos([...response]);
     } catch (error) {
       console.log(error.messages);

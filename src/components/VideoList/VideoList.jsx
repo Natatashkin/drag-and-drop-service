@@ -4,20 +4,16 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
 
-const VideoList = ({ children }) => {
+const VideoList = ({ title, listId, children }) => {
   const s = useStyles();
   return (
     <Box className={s.listBox}>
       <Typography variant="h1" gutterBottom>
-        Popular in YouTube UA
+        {title}
       </Typography>
-      <Droppable droppableId="videoList">
+      <Droppable droppableId={listId}>
         {provided => (
-          <List
-            classes={{ root: s.list }}
-            ref={provided.innerRef}
-            {...provided.droppableProps}
-          >
+          <List ref={provided.innerRef} {...provided.droppableProps}>
             {children}
             {provided.placeholder}
           </List>

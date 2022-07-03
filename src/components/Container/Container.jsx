@@ -1,9 +1,9 @@
-import Box from '@mui/material/Box';
+import { Container as AppContainer } from '@mui/material';
 import { useStyles } from './Container.styles';
 
 const Container = ({ children }) => {
   const s = useStyles();
-  return <Box className={s.container}>{children}</Box>;
+  return <AppContainer className={s.container}>{children}</AppContainer>;
 };
 
 export default Container;

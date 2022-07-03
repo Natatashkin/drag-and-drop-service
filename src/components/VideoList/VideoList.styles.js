@@ -3,19 +3,17 @@ import makeStyles from '@mui/styles/makeStyles';
 export const useStyles = makeStyles(theme => {
   const {
     spacing,
-    colors: { $violet, $orange, $white },
+    colors: { $violet, $white },
   } = theme;
   return {
     listBox: {
       backgroundColor: $violet,
-      maxWidth: 'fit-content',
+      width: '432px',
       padding: spacing(2),
       textAlign: 'center',
       textDecorationColor: 'black',
       color: $white,
-    },
-    list: {
-      maxWidth: 'fit-content',
+      boxSizing: 'border-box',
     },
   };
 });

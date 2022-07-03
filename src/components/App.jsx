@@ -22,11 +22,27 @@ export const App = () => {
   const handleOnDragEnd = result => {
     console.log(result);
     if (!result.destination) return;
-    const items = Array.from(popularVideos);
-    const [reorderedVideo] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedVideo);
 
-    setPopularVideos(items);
+    const start = result.source.droppableId;
+    const finish = result.destination.droppableId;
+
+    if (start === finish) {
+      setPopularVideos(prevVideo => {
+        const items = [...prevVideo];
+        const [reorderedVideo] = items.splice(result.source.index, 1);
+        items.splice(result.destination.index, 0, reorderedVideo);
+        return items;
+      });
+      return;
+    }
+
+    const popularItems = [...popularVideos];
+    const [removedItem] = popularItems.splice(result.source.index, 1);
+    setPopularVideos(popularItems);
+
+    const favoriteItems = [...favoriteVideos];
+    favoriteItems.splice(result.destination.index, 0, removedItem);
+    setFavoriteVideos(favoriteItems);
   };
 
   return (
@@ -34,9 +50,15 @@ export const App = () => {
       <ThemeProvider theme={theme}>
         <Container>
           <DragDropContext onDragEnd={handleOnDragEnd}>
-            <VideoList>
+            <VideoList title="Popular in YouTube UA" listId="popular">
               {popularVideos &&
                 popularVideos.map((video, index) => (
+                  <VideoListItem key={video.id} video={video} index={index} />
+                ))}
+            </VideoList>
+            <VideoList title="Favorite videos" listId="favorite">
+              {favoriteVideos &&
+                favoriteVideos.map((video, index) => (
                   <VideoListItem key={video.id} video={video} index={index} />
                 ))}
             </VideoList>
