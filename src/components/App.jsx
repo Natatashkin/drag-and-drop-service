@@ -15,34 +15,67 @@ export const App = () => {
   const [popularVideos, setPopularVideos] = useState([]);
   const [favoriteVideos, setFavoriteVideos] = useState([]);
 
+  const reorderItems = (items, result) => {
+    const videos = [...items];
+    const [reorderedVideo] = videos.splice(result.source.index, 1);
+    videos.splice(result.destination.index, 0, reorderedVideo);
+    return videos;
+  };
+
+  const replacedItem = (targetList, handler, result) => {
+    const items = [...targetList];
+    const [removedItem] = items.splice(result.source.index, 1);
+    handler(items);
+    return removedItem;
+  };
+
+  const addNewItem = (targetList, newItem, handler, result) => {
+    const items = [...targetList];
+    items.splice(result.destination.index, 0, newItem);
+    handler(items);
+  };
+
   useEffect(() => {
     setPopularVideos(videos);
   }, [videos]);
 
   const handleOnDragEnd = result => {
-    console.log(result);
     if (!result.destination) return;
 
     const start = result.source.droppableId;
     const finish = result.destination.droppableId;
 
     if (start === finish) {
-      setPopularVideos(prevVideo => {
-        const items = [...prevVideo];
-        const [reorderedVideo] = items.splice(result.source.index, 1);
-        items.splice(result.destination.index, 0, reorderedVideo);
-        return items;
-      });
+      switch (finish) {
+        case 'popular':
+          setPopularVideos(prevItems => reorderItems(prevItems, result));
+          return;
+        case 'favorite':
+          setFavoriteVideos(prevItems => reorderItems(prevItems, result));
+          return;
+        default:
+          return;
+      }
+    }
+
+    const isShouldAddNewItem = start === 'popular' && finish === 'favorite';
+
+    if (isShouldAddNewItem) {
+      const itemToReplace = replacedItem(
+        popularVideos,
+        setPopularVideos,
+        result
+      );
+      addNewItem(favoriteVideos, itemToReplace, setFavoriteVideos, result);
       return;
     }
 
-    const popularItems = [...popularVideos];
-    const [removedItem] = popularItems.splice(result.source.index, 1);
-    setPopularVideos(popularItems);
-
-    const favoriteItems = [...favoriteVideos];
-    favoriteItems.splice(result.destination.index, 0, removedItem);
-    setFavoriteVideos(favoriteItems);
+    const itemToReplace = replacedItem(
+      favoriteVideos,
+      setFavoriteVideos,
+      result
+    );
+    addNewItem(popularVideos, itemToReplace, setPopularVideos, result);
   };
 
   return (
