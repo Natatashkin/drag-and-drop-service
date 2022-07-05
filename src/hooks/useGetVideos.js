@@ -2,8 +2,16 @@ import { useState, useEffect, useCallback } from 'react';
 import * as youtubeAPI from 'services/youtubeAPI';
 
 export const useGetVideos = () => {
-  const [popularVideos, setPopularVideos] = useState([]);
-  const [favoriteVideos, setFavoriteVideos] = useState([]);
+  const [lists, setLists] = useState({
+    popular: {
+      title: 'Popular in YouTube UA',
+      items: [],
+    },
+    favorite: {
+      title: 'Favorite videos',
+      items: [],
+    },
+  });
 
   const getPopularVideos = useCallback(async () => {
     try {
@@ -12,7 +20,16 @@ export const useGetVideos = () => {
         const newItem = { ...video, favorite: false };
         return newItem;
       });
-      setPopularVideos(videosWithFavorite);
+      console.log(videosWithFavorite);
+      setLists(prevLists => {
+        return {
+          ...prevLists,
+          popular: {
+            ...prevLists.popular,
+            items: videosWithFavorite,
+          },
+        };
+      });
     } catch (error) {
       console.log(error.messages);
     }
@@ -23,9 +40,7 @@ export const useGetVideos = () => {
   }, []);
 
   return {
-    popularVideos,
-    setPopularVideos,
-    favoriteVideos,
-    setFavoriteVideos,
+    lists,
+    setLists,
   };
 };
