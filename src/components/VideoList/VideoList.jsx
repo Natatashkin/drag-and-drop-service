@@ -1,8 +1,9 @@
 import { Droppable } from 'react-beautiful-dnd';
-import { useStyles } from './VideoList.styles';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
+
+import { useStyles } from './VideoList.styles';
 
 const VideoList = ({ title, listId, children }) => {
   const s = useStyles();
@@ -12,12 +13,18 @@ const VideoList = ({ title, listId, children }) => {
         {title}
       </Typography>
       <Droppable droppableId={listId}>
-        {provided => (
-          <List ref={provided.innerRef} {...provided.droppableProps}>
-            {children}
-            {provided.placeholder}
-          </List>
-        )}
+        {provided => {
+          return (
+            <List
+              className={s.list}
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+            >
+              {children}
+              {provided.placeholder}
+            </List>
+          );
+        }}
       </Droppable>
     </Box>
   );

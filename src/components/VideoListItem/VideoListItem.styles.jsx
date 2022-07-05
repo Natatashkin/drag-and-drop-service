@@ -8,7 +8,7 @@ export const useStyles = makeStyles(theme => {
   } = theme;
   return {
     li: {
-      width: '400px',
+      width: '340px',
       flexDirection: 'column',
       alignItems: 'center',
       color: $black,
@@ -35,6 +35,12 @@ export const useStyles = makeStyles(theme => {
     iconFavoriteBox: {
       padding: spacing(2),
       '&:hover svg': {
+        fill: $orange,
+      },
+    },
+
+    iconFavoriteActive: {
+      '& svg': {
         fill: $orange,
       },
     },

@@ -9,6 +9,12 @@ const FONTWEIGHT_BOLD = '700';
 
 const LINEHEIGHT = '1';
 
+const WHITE = '#ffffff';
+const ORANGE = '#f08a16';
+const VIOLET = '#ee82ee';
+const BLACK = '#000000';
+const BLUE = '#0099ff';
+
 const theme = createTheme({
   typography: {
     h1: {
@@ -28,10 +34,30 @@ const theme = createTheme({
     },
   },
   colors: {
-    $white: '#ffffff',
-    $orange: '#f08a16',
-    $violet: '#ee82ee',
-    $black: '#000000',
+    $white: WHITE,
+    $orange: ORANGE,
+    $violet: VIOLET,
+    $black: BLACK,
+    $blue: BLUE,
+  },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          margin: '0',
+          fontFamily:
+            "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen','Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
+          '-webkit-font-smoothing': 'antialiased',
+          '-moz-osx-font-smoothing': 'grayscale',
+          backgroundColor: VIOLET,
+        },
+
+        code: {
+          fontFamily:
+            "source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace",
+        },
+      },
+    },
   },
 });
 

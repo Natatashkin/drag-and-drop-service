@@ -1,98 +1,103 @@
-import { useState, useRef, useEffect } from 'react';
+import { useCallback } from 'react';
+import { DragDropContext } from 'react-beautiful-dnd';
 import { StylesProvider } from '@mui/styles';
 import { ThemeProvider } from '@mui/material';
+import CssBaseline from '@mui/material/CssBaseline';
 import theme from 'styles/theme';
 import { jss, generateClassName } from 'styles/utils';
-import { DragDropContext } from 'react-beautiful-dnd';
 import { useGetVideos } from 'hooks/useGetVideos';
+import { reorderItems, addNewItem, replacedItem } from 'helpers/helpers';
 import { Container } from './Container';
 import { VideoList } from './VideoList';
 import { VideoListItem } from './VideoListItem';
-import { FavoriteVideoList } from './FavotiteVideoList';
 
 export const App = () => {
-  const { videos } = useGetVideos();
-  const [popularVideos, setPopularVideos] = useState([]);
-  const [favoriteVideos, setFavoriteVideos] = useState([]);
+  const { popularVideos, setPopularVideos, favoriteVideos, setFavoriteVideos } =
+    useGetVideos();
 
-  const reorderItems = (items, result) => {
-    const videos = [...items];
-    const [reorderedVideo] = videos.splice(result.source.index, 1);
-    videos.splice(result.destination.index, 0, reorderedVideo);
-    return videos;
-  };
+  const handleOnDragEnd = useCallback(
+    result => {
+      if (!result.destination) return;
 
-  const replacedItem = (targetList, handler, result) => {
-    const items = [...targetList];
-    const [removedItem] = items.splice(result.source.index, 1);
-    handler(items);
-    return removedItem;
-  };
+      const start = result.source.droppableId;
+      const finish = result.destination.droppableId;
 
-  const addNewItem = (targetList, newItem, handler, result) => {
-    const items = [...targetList];
-    items.splice(result.destination.index, 0, newItem);
-    handler(items);
-  };
+      const isShouldAddNewItem = start === 'popular' && finish === 'favorite';
+      const videosCollections = [popularVideos, favoriteVideos];
+      const setCollections = [setPopularVideos, setFavoriteVideos];
 
-  useEffect(() => {
-    setPopularVideos(videos);
-  }, [videos]);
-
-  const handleOnDragEnd = result => {
-    if (!result.destination) return;
-
-    const start = result.source.droppableId;
-    const finish = result.destination.droppableId;
-
-    if (start === finish) {
-      switch (finish) {
-        case 'popular':
-          setPopularVideos(prevItems => reorderItems(prevItems, result));
-          return;
-        case 'favorite':
-          setFavoriteVideos(prevItems => reorderItems(prevItems, result));
-          return;
-        default:
-          return;
+      if (start === finish) {
+        switch (finish) {
+          case 'popular':
+            setPopularVideos(prevItems => reorderItems(prevItems, result));
+            return;
+          case 'favorite':
+            setFavoriteVideos(prevItems => reorderItems(prevItems, result));
+            return;
+          default:
+            return;
+        }
       }
-    }
 
-    const isShouldAddNewItem = start === 'popular' && finish === 'favorite';
-
-    if (isShouldAddNewItem) {
       const itemToReplace = replacedItem(
-        popularVideos,
-        setPopularVideos,
+        videosCollections[Number(!isShouldAddNewItem)],
+        setCollections[Number(!isShouldAddNewItem)],
         result
       );
-      addNewItem(favoriteVideos, itemToReplace, setFavoriteVideos, result);
-      return;
-    }
+      addNewItem(
+        videosCollections[Number(isShouldAddNewItem)],
+        itemToReplace,
+        setCollections[Number(isShouldAddNewItem)],
+        result
+      );
+    },
+    [favoriteVideos, popularVideos]
+  );
 
-    const itemToReplace = replacedItem(
-      favoriteVideos,
-      setFavoriteVideos,
-      result
+  const handleReplace = useCallback(video => {
+    const { id, favorite } = video;
+    const removeItemHandler = !favorite ? setFavoriteVideos : setPopularVideos;
+    const addItemHandler = favorite ? setFavoriteVideos : setPopularVideos;
+    addItemHandler(prev =>
+      prev.filter(({ id: innerId }) => {
+        return innerId !== id;
+      })
     );
-    addNewItem(popularVideos, itemToReplace, setPopularVideos, result);
-  };
+    removeItemHandler(prev => {
+      const newVideo = {
+        ...video,
+        favorite: !favorite,
+      };
+      return [...prev, newVideo];
+    });
+  }, []);
 
   return (
     <StylesProvider jss={jss} generateClassName={generateClassName}>
       <ThemeProvider theme={theme}>
+        <CssBaseline />
         <Container>
           <DragDropContext onDragEnd={handleOnDragEnd}>
             <VideoList title="Popular in YouTube UA" listId="popular">
-              {popularVideos &&
+              {Boolean(popularVideos.length) &&
                 popularVideos.map((video, index) => (
-                  <VideoListItem key={video.id} video={video} index={index} />
+                  <VideoListItem
+                    key={video.id}
+                    video={video}
+                    index={index}
+                    replaceVideo={handleReplace}
+                  />
                 ))}
             </VideoList>
             <VideoList title="Favorite videos" listId="favorite">
-              {favoriteVideos &&
+              {Boolean(favoriteVideos.length) &&
                 favoriteVideos.map((video, index) => (
-                  <VideoListItem key={video.id} video={video} index={index} />
+                  <VideoListItem
+                    key={video.id}
+                    video={video}
+                    index={index}
+                    replaceVideo={handleReplace}
+                  />
                 ))}
             </VideoList>
           </DragDropContext>
