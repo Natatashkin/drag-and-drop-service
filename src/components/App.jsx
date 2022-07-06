@@ -20,9 +20,34 @@ export const App = () => {
 
   const listsData = Object.entries(lists);
 
-  const handleOnDragEnd = useCallback(result => {
-    console.log(result);
-  }, []);
+  const handleOnDragEnd = useCallback(
+    result => {
+      console.log(result);
+      if (!result.destination) return;
+
+      const startListId = result.source.droppableId;
+      const finishListId = result.destination.droppableId;
+
+      if (startListId === finishListId) {
+        const currentList = listsData.find(([key]) => key === startListId);
+        const [key, data] = currentList;
+        const { items } = data;
+        const [replacedItem] = items.splice(result.source.index, 1);
+        items.splice(result.destination.index, 0, replacedItem);
+
+        setLists(prevList => {
+          return {
+            ...prevList,
+            [key]: {
+              ...prevList[key],
+              items: [...items],
+            },
+          };
+        });
+      }
+    },
+    [listsData]
+  );
 
   const handleGetNewList = newTitle => {
     const array = newTitle.split(' ').filter(Boolean);
