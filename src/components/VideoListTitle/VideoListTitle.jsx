@@ -5,17 +5,18 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import { IconButton } from '../IconButton';
 import { useStyles } from './VideoListTitle.styles';
 
-const VideoListTitle = ({ title, onDeleteList }) => {
-  // const handleDeleteIconClick = () => {};
+const VideoListTitle = ({ title, isDefault, onDeleteList }) => {
   const s = useStyles();
   return (
     <Box className={s.titleContainer}>
       <Typography variant="h1">{title}</Typography>
-      <IconButton
-        buttonStyles={s.icon}
-        icon={<DeleteForeverIcon />}
-        onClick={onDeleteList}
-      />
+      {!isDefault && (
+        <IconButton
+          buttonStyles={s.icon}
+          icon={<DeleteForeverIcon />}
+          onClick={onDeleteList}
+        />
+      )}
     </Box>
   );
 };

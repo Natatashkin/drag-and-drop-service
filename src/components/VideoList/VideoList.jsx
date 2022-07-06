@@ -5,12 +5,22 @@ import List from '@mui/material/List';
 import { VideoListTitle } from '../VideoListTitle';
 import { useStyles } from './VideoList.styles';
 
-const VideoList = ({ title, listId, onDeleteList, children }) => {
+const VideoList = ({
+  title,
+  listId,
+  isDefault = false,
+  onDeleteList,
+  children,
+}) => {
   const s = useStyles();
 
   return (
     <Box className={s.listBox}>
-      <VideoListTitle title={title} onDeleteList={() => onDeleteList(listId)} />
+      <VideoListTitle
+        isDefault={isDefault}
+        title={title}
+        onDeleteList={() => onDeleteList(listId)}
+      />
       <Droppable droppableId={listId}>
         {provided => {
           return (

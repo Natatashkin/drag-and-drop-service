@@ -6,10 +6,12 @@ export const useGetVideos = () => {
     popular: {
       title: 'Popular in YouTube UA',
       items: [],
+      isDefault: true,
     },
     favorite: {
       title: 'Favorite videos',
       items: [],
+      isDefault: true,
     },
   });
 

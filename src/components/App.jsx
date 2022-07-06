@@ -62,12 +62,13 @@ export const App = () => {
         <MainContainer>
           <DragDropContext onDragEnd={handleOnDragEnd}>
             {listsData.map(([listId, data]) => {
-              const { title, items } = data;
+              const { title, items, isDefault } = data;
               return (
                 <VideoList
                   key={listId}
                   title={title}
                   listId={listId}
+                  isDefault={isDefault}
                   onDeleteList={handleDeleteList}
                 >
                   {items.map((video, index) => {

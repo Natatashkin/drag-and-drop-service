@@ -6,6 +6,7 @@ export const useSyles = makeStyles(theme => {
   } = theme;
   return {
     button: {
+      whiteSpace: 'nowrap',
       backgroundColor: $blue,
     },
   };
