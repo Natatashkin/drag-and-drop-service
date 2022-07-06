@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { StylesProvider } from '@mui/styles';
 import { ThemeProvider } from '@mui/material';
@@ -8,34 +8,68 @@ import { Button } from './Button';
 import theme from 'styles/theme';
 import { jss, generateClassName } from 'styles/utils';
 import { useGetVideos } from 'hooks/useGetVideos';
-import { reorderItems, addNewItem, replacedItem } from 'helpers/helpers';
-import { Container } from './Container';
+// import { reorderItems, addNewItem, replacedItem } from 'helpers/helpers';
+import { MainContainer } from './MainContainer';
 import { VideoList } from './VideoList';
 import { VideoListItem } from './VideoListItem';
+import { Form } from './Form';
 
 export const App = () => {
   const { lists, setLists } = useGetVideos();
+  const [newList, setNewList] = useState(false);
 
   const listsData = Object.entries(lists);
-  console.log(listsData);
 
   const handleOnDragEnd = useCallback(result => {}, []);
-  const handleAddTackClick = useCallback(() => {}, []);
+
+  const handleAddTackClick = useCallback(() => {
+    setNewList(true);
+  }, []);
+
+  const handleGetNewList = newTitle => {
+    const array = newTitle.split(' ').filter(Boolean);
+    const newListId = array
+      .map(item => item[0].toUpperCase() + item.substring(1, item.length))
+      .join('');
+
+    const newList = {
+      [newListId]: {
+        title: newTitle,
+        items: [],
+      },
+    };
+    setLists(prevLists => {
+      return {
+        ...prevLists,
+        ...newList,
+      };
+    });
+  };
+
+  const handleDeleteList = id => {
+    setLists(prevLists => {
+      const updatedLists = Object.entries(prevLists).filter(([key]) => {
+        return key !== id;
+      });
+      return Object.fromEntries(updatedLists);
+    });
+  };
 
   return (
     <StylesProvider jss={jss} generateClassName={generateClassName}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Container>
-          <Box>
-            <Button title="Add new list" onClick={handleAddTackClick} />
-          </Box>
-
+        <MainContainer>
           <DragDropContext onDragEnd={handleOnDragEnd}>
             {listsData.map(([listId, data]) => {
               const { title, items } = data;
               return (
-                <VideoList title={title} listId={listId}>
+                <VideoList
+                  key={listId}
+                  title={title}
+                  listId={listId}
+                  onDeleteList={handleDeleteList}
+                >
                   {items.map((video, index) => {
                     return (
                       <VideoListItem
@@ -49,7 +83,17 @@ export const App = () => {
               );
             })}
           </DragDropContext>
-        </Container>
+          {newList ? (
+            <Form
+              onAddNewList={handleGetNewList}
+              onCloseForm={() => setNewList(!newList)}
+            />
+          ) : (
+            <Box>
+              <Button title="Add new list" onClick={handleAddTackClick} />
+            </Box>
+          )}
+        </MainContainer>
       </ThemeProvider>
     </StylesProvider>
   );

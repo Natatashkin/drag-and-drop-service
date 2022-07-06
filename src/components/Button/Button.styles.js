@@ -7,7 +7,6 @@ export const useSyles = makeStyles(theme => {
   return {
     button: {
       backgroundColor: $blue,
-      marginTop: '59px',
     },
   };
 });

@@ -20,7 +20,7 @@ export const useGetVideos = () => {
         const newItem = { ...video, favorite: false };
         return newItem;
       });
-      console.log(videosWithFavorite);
+
       setLists(prevLists => {
         return {
           ...prevLists,

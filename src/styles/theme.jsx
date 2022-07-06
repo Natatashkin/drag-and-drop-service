@@ -1,7 +1,7 @@
 import { createTheme } from '@mui/material';
 
-const FONTSIZE_LARGE = '32px';
-const FONTSIZE_MEDIUM = '24px';
+const FONTSIZE_LARGE = '24px';
+const FONTSIZE_MEDIUM = '18px';
 const FONTSIZE_SMALL = '14px';
 
 const FONTWEIGHT_BOLD = '700';
@@ -50,6 +50,7 @@ const theme = createTheme({
           '-webkit-font-smoothing': 'antialiased',
           '-moz-osx-font-smoothing': 'grayscale',
           backgroundColor: VIOLET,
+          overflowX: 'scroll',
         },
 
         code: {

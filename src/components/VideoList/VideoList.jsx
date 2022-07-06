@@ -1,17 +1,16 @@
 import { Droppable } from 'react-beautiful-dnd';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
 
+import { VideoListTitle } from '../VideoListTitle';
 import { useStyles } from './VideoList.styles';
 
-const VideoList = ({ title, listId, children }) => {
+const VideoList = ({ title, listId, onDeleteList, children }) => {
   const s = useStyles();
+
   return (
     <Box className={s.listBox}>
-      <Typography variant="h1" gutterBottom>
-        {title}
-      </Typography>
+      <VideoListTitle title={title} onDeleteList={() => onDeleteList(listId)} />
       <Droppable droppableId={listId}>
         {provided => {
           return (
