@@ -20,10 +20,8 @@ export const App = () => {
 
   const listsData = Object.entries(lists);
 
-  const handleOnDragEnd = useCallback(result => {}, []);
-
-  const handleAddTackClick = useCallback(() => {
-    setNewList(true);
+  const handleOnDragEnd = useCallback(result => {
+    console.log(result);
   }, []);
 
   const handleGetNewList = newTitle => {
@@ -91,7 +89,7 @@ export const App = () => {
             />
           ) : (
             <Box>
-              <Button title="Add new list" onClick={handleAddTackClick} />
+              <Button title="Add new list" onClick={() => setNewList(true)} />
             </Box>
           )}
         </MainContainer>
@@ -99,31 +97,6 @@ export const App = () => {
     </StylesProvider>
   );
 };
-
-{
-  /* <VideoList title="Popular in YouTube UA" listId="popular">
-              {Boolean(popularVideos.length) &&
-                popularVideos.map((video, index) => (
-                  <VideoListItem
-                    key={video.id}
-                    video={video}
-                    index={index}
-                    // replaceVideo={handleReplace}
-                  />
-                ))}
-            </VideoList>
-            <VideoList title="Favorite videos" listId="favorite">
-              {Boolean(favoriteVideos.length) &&
-                favoriteVideos.map((video, index) => (
-                  <VideoListItem
-                    key={video.id}
-                    video={video}
-                    index={index}
-                    // replaceVideo={handleReplace}
-                  />
-                ))}
-            </VideoList> */
-}
 
 // const handleOnDragEnd = useCallback(
 //   result => {
