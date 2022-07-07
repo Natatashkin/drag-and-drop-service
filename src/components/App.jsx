@@ -8,7 +8,12 @@ import { Button } from './Button';
 import theme from 'styles/theme';
 import { jss, generateClassName } from 'styles/utils';
 import { useGetVideos } from 'hooks/useGetVideos';
-// import { reorderItems, addNewItem, replacedItem } from 'helpers/helpers';
+import {
+  reorderItems,
+  addNewItem,
+  replacedItem,
+  updateLists,
+} from 'helpers/helpers';
 import { MainContainer } from './MainContainer';
 import { VideoList } from './VideoList';
 import { VideoListItem } from './VideoListItem';
@@ -22,31 +27,59 @@ export const App = () => {
 
   const handleOnDragEnd = useCallback(
     result => {
-      console.log(result);
       if (!result.destination) return;
 
       const startListId = result.source.droppableId;
       const finishListId = result.destination.droppableId;
+      const startList = lists[startListId].items;
+      const finishList = lists[finishListId].items;
 
-      if (startListId === finishListId) {
-        const currentList = listsData.find(([key]) => key === startListId);
-        const [key, data] = currentList;
-        const { items } = data;
-        const [replacedItem] = items.splice(result.source.index, 1);
-        items.splice(result.destination.index, 0, replacedItem);
+      const isListIdEqual = startListId === finishListId;
 
-        setLists(prevList => {
+      // same list
+      if (isListIdEqual) {
+        const newList = updateLists(result, startList);
+
+        setLists(prevLists => {
           return {
-            ...prevList,
-            [key]: {
-              ...prevList[key],
-              items: [...items],
+            ...prevLists,
+            ...{
+              [finishListId]: {
+                ...prevLists[finishListId],
+                items: newList,
+              },
             },
           };
         });
+        return;
       }
+
+      //diferent lists
+      const [sourceList, destinationList] = updateLists(
+        result,
+        startList,
+        finishList
+      );
+
+      setLists(prevLists => {
+        return {
+          ...prevLists,
+          ...{
+            [startListId]: {
+              ...prevLists[startListId],
+              items: sourceList,
+            },
+          },
+          ...{
+            [finishListId]: {
+              ...prevLists[finishListId],
+              items: destinationList,
+            },
+          },
+        };
+      });
     },
-    [listsData]
+    [lists]
   );
 
   const handleGetNewList = newTitle => {
@@ -97,7 +130,7 @@ export const App = () => {
                   {items.map((video, index) => {
                     return (
                       <VideoListItem
-                        key={data.id}
+                        key={video.id}
                         video={video}
                         index={index}
                       />
@@ -122,6 +155,46 @@ export const App = () => {
     </StylesProvider>
   );
 };
+
+// const startListId = result.source.droppableId;
+// const finishListId = result.destination.droppableId;
+
+// const items = [...paramsLists[startListId].items];
+// const finishItems = [...paramsLists[finishListId].items];
+// const [replacedItem] = items.splice(result.source.index, 1);
+// finishItems.splice(result.source.destination, 0, replacedItem);
+
+// setLists(prev => {
+//   return {
+//     ...prev,
+//     [startListId]: {
+//       ...prev[startListId],
+//       items,
+//     },
+//     [finishListId]: {
+//       ...prev[finishListId],
+//       items: finishItems,
+//     },
+//   };
+// });
+//
+// if (startListId === finishListId) {
+//   const currentList = listsData.find(([key]) => key === startListId);
+//   const [key, data] = currentList;
+//   const { items } = data;
+//   const [replacedItem] = items.splice(result.source.index, 1);
+//   items.splice(result.destination.index, 0, replacedItem);
+
+//   setLists(prevList => {
+//     return {
+//       ...prevList,
+//       [key]: {
+//         ...prevList[key],
+//         items,
+//       },
+//     };
+//   });
+// }
 
 // const handleOnDragEnd = useCallback(
 //   result => {
