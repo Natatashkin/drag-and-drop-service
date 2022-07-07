@@ -123,25 +123,6 @@ export const App = () => {
         },
       };
     });
-    // setLists(prevLists => {
-    //   const allLists = Object.entries(prevLists);
-    //   const listToDel = allLists.find(([key]) => key === id);
-    //   const videos = listToDel[1].items;
-    //   console.log(videos);
-    //   const updatedLists = Object.entries(prevLists).filter(([key]) => {
-    //     return key !== id;
-    //   });
-    //   const x = updatedLists.map(([key, values]) => {
-    //     if (key === 'popular') {
-    //       console.log(values);
-    //       const arr = values.items;
-    //       const newItems = [...arr, ...videos];
-    //       return;
-    //     }
-    //   });
-    //   console.log(updatedLists);
-    //   return Object.fromEntries(updatedLists);
-    // });
   };
 
   return (
