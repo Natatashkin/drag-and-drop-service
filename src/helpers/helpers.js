@@ -1,14 +1,20 @@
-export const updateLists = (result, sourceList, destinationList) => {
-  if (!destinationList) {
-    const videos = [...sourceList];
-    const [reorderedVideo] = videos.splice(result.source.index, 1);
-    videos.splice(result.destination.index, 0, reorderedVideo);
-    return videos;
-  }
-
+export const updateLists = (
+  destinationListId,
+  result,
+  sourceList,
+  destinationList
+) => {
+  const list = destinationList || sourceList;
   const startList = [...sourceList];
-  const finishList = [...destinationList];
+  const finishList = [...list];
+  if (!destinationList) {
+    finishList.splice(result.source.index, 1);
+  }
   const [removedItem] = startList.splice(result.source.index, 1);
-  finishList.splice(result.destination.index, 0, removedItem);
+  const newRemovedItem = {
+    ...removedItem,
+    favorite: destinationListId === 'favorite',
+  };
+  finishList.splice(result.destination.index, 0, newRemovedItem);
   return [startList, finishList];
 };

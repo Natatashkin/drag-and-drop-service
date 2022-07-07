@@ -8,6 +8,7 @@ import { useStyles } from './VideoList.styles';
 const VideoList = ({
   title,
   listId,
+  items,
   isDefault = false,
   onDeleteList,
   children,
@@ -19,7 +20,7 @@ const VideoList = ({
       <VideoListTitle
         isDefault={isDefault}
         title={title}
-        onDeleteList={() => onDeleteList(listId)}
+        onDeleteList={() => onDeleteList(listId, items)}
       />
       <Droppable droppableId={listId}>
         {provided => {

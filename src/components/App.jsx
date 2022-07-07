@@ -8,12 +8,7 @@ import { Button } from './Button';
 import theme from 'styles/theme';
 import { jss, generateClassName } from 'styles/utils';
 import { useGetVideos } from 'hooks/useGetVideos';
-import {
-  reorderItems,
-  addNewItem,
-  replacedItem,
-  updateLists,
-} from 'helpers/helpers';
+import { updateLists } from 'helpers/helpers';
 import { MainContainer } from './MainContainer';
 import { VideoList } from './VideoList';
 import { VideoListItem } from './VideoListItem';
@@ -22,7 +17,6 @@ import { Form } from './Form';
 export const App = () => {
   const { lists, setLists } = useGetVideos();
   const [newList, setNewList] = useState(false);
-
   const listsData = Object.entries(lists);
 
   const handleOnDragEnd = useCallback(
@@ -36,46 +30,35 @@ export const App = () => {
 
       const isListIdEqual = startListId === finishListId;
 
-      // same list
-      if (isListIdEqual) {
-        const newList = updateLists(result, startList);
-
-        setLists(prevLists => {
-          return {
-            ...prevLists,
-            ...{
-              [finishListId]: {
-                ...prevLists[finishListId],
-                items: newList,
-              },
-            },
-          };
-        });
-        return;
-      }
-
-      //diferent lists
-      const [sourceList, destinationList] = updateLists(
+      const [firstList, secondList] = updateLists(
+        finishListId,
         result,
         startList,
-        finishList
+        isListIdEqual ? null : finishList
       );
 
-      setLists(prevLists => {
+      setLists(prev => {
+        const compareListsResult = {};
+        const destinationList = {
+          ...prev[finishListId],
+          items: secondList,
+        };
+
+        const sourceList = {
+          ...prev[startListId],
+          items: firstList,
+        };
+
+        if (isListIdEqual) {
+          compareListsResult[finishListId] = { ...destinationList };
+        } else {
+          compareListsResult[startListId] = { ...sourceList };
+          compareListsResult[finishListId] = { ...destinationList };
+        }
+
         return {
-          ...prevLists,
-          ...{
-            [startListId]: {
-              ...prevLists[startListId],
-              items: sourceList,
-            },
-          },
-          ...{
-            [finishListId]: {
-              ...prevLists[finishListId],
-              items: destinationList,
-            },
-          },
+          ...prev,
+          ...compareListsResult,
         };
       });
     },
@@ -102,13 +85,63 @@ export const App = () => {
     });
   };
 
-  const handleDeleteList = id => {
-    setLists(prevLists => {
-      const updatedLists = Object.entries(prevLists).filter(([key]) => {
-        return key !== id;
-      });
-      return Object.fromEntries(updatedLists);
+  const toggleFavoriteVideo = (listId, video) => {
+    setLists(prev => {
+      const isFavorite = listId === 'favorite';
+      const formattedVideo = {
+        ...video,
+        favorite: !isFavorite,
+      };
+      const newItems = prev[listId].items.filter(({ id }) => id !== video.id);
+      const listKey = isFavorite ? 'favorite' : listId;
+      const destinationListKey = isFavorite ? 'popular' : 'favorite';
+      return {
+        ...prev,
+        [listKey]: {
+          ...prev[listKey],
+          items: newItems,
+        },
+        [destinationListKey]: {
+          ...prev[destinationListKey],
+          items: [formattedVideo, ...prev[destinationListKey].items],
+        },
+      };
     });
+  };
+
+  const handleDeleteList = (id, deletedListItems) => {
+    setLists(prev => {
+      const formattedPopular = {
+        ...prev.popular,
+        items: [...deletedListItems, ...prev.popular.items],
+      };
+      delete prev[id];
+      return {
+        ...prev,
+        popular: {
+          ...formattedPopular,
+        },
+      };
+    });
+    // setLists(prevLists => {
+    //   const allLists = Object.entries(prevLists);
+    //   const listToDel = allLists.find(([key]) => key === id);
+    //   const videos = listToDel[1].items;
+    //   console.log(videos);
+    //   const updatedLists = Object.entries(prevLists).filter(([key]) => {
+    //     return key !== id;
+    //   });
+    //   const x = updatedLists.map(([key, values]) => {
+    //     if (key === 'popular') {
+    //       console.log(values);
+    //       const arr = values.items;
+    //       const newItems = [...arr, ...videos];
+    //       return;
+    //     }
+    //   });
+    //   console.log(updatedLists);
+    //   return Object.fromEntries(updatedLists);
+    // });
   };
 
   return (
@@ -123,6 +156,7 @@ export const App = () => {
                 <VideoList
                   key={listId}
                   title={title}
+                  items={items}
                   listId={listId}
                   isDefault={isDefault}
                   onDeleteList={handleDeleteList}
@@ -133,6 +167,7 @@ export const App = () => {
                         key={video.id}
                         video={video}
                         index={index}
+                        replaceVideo={() => toggleFavoriteVideo(listId, video)}
                       />
                     );
                   })}
@@ -155,100 +190,3 @@ export const App = () => {
     </StylesProvider>
   );
 };
-
-// const startListId = result.source.droppableId;
-// const finishListId = result.destination.droppableId;
-
-// const items = [...paramsLists[startListId].items];
-// const finishItems = [...paramsLists[finishListId].items];
-// const [replacedItem] = items.splice(result.source.index, 1);
-// finishItems.splice(result.source.destination, 0, replacedItem);
-
-// setLists(prev => {
-//   return {
-//     ...prev,
-//     [startListId]: {
-//       ...prev[startListId],
-//       items,
-//     },
-//     [finishListId]: {
-//       ...prev[finishListId],
-//       items: finishItems,
-//     },
-//   };
-// });
-//
-// if (startListId === finishListId) {
-//   const currentList = listsData.find(([key]) => key === startListId);
-//   const [key, data] = currentList;
-//   const { items } = data;
-//   const [replacedItem] = items.splice(result.source.index, 1);
-//   items.splice(result.destination.index, 0, replacedItem);
-
-//   setLists(prevList => {
-//     return {
-//       ...prevList,
-//       [key]: {
-//         ...prevList[key],
-//         items,
-//       },
-//     };
-//   });
-// }
-
-// const handleOnDragEnd = useCallback(
-//   result => {
-//     if (!result.destination) return;
-
-//     const start = result.source.droppableId;
-//     const finish = result.destination.droppableId;
-
-//     const isShouldAddNewItem = start === 'popular' && finish === 'favorite';
-//     const videosCollections = [popularVideos, favoriteVideos];
-//     const setCollections = [setPopularVideos, setFavoriteVideos];
-
-//     if (start === finish) {
-//       switch (finish) {
-//         case 'popular':
-//           setPopularVideos(prevItems => reorderItems(prevItems, result));
-//           return;
-//         case 'favorite':
-//           setFavoriteVideos(prevItems => reorderItems(prevItems, result));
-//           return;
-//         default:
-//           return;
-//       }
-//     }
-
-//     const itemToReplace = replacedItem(
-//       videosCollections[Number(!isShouldAddNewItem)],
-//       setCollections[Number(!isShouldAddNewItem)],
-//       result
-//     );
-//     addNewItem(
-//       videosCollections[Number(isShouldAddNewItem)],
-//       itemToReplace,
-//       setCollections[Number(isShouldAddNewItem)],
-//       result
-//     );
-//   },
-//   [favoriteVideos, popularVideos]
-// );
-
-// const handleReplace = useCallback(video => {
-//   const { id, favorite } = video;
-//   const removeItemHandler = !favorite ? setFavoriteVideos : setPopularVideos;
-//   const addItemHandler = favorite ? setFavoriteVideos : setPopularVideos;
-//   addItemHandler(prev =>
-//     prev.filter(({ id: innerId }) => {
-//       return innerId !== id;
-//     })
-//   );
-//   removeItemHandler(prev => {
-//     const newVideo = {
-//       ...video,
-//       favorite: !favorite,
-//     };
-//     return [...prev, newVideo];
-//   });
-// }, []);

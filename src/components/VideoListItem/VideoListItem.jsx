@@ -49,9 +49,7 @@ const VideoListItem = ({ video, index, replaceVideo }) => {
                     [s.iconFavoriteActive]: favorite,
                   },
                 ])}
-                onClick={() => {
-                  replaceVideo(video);
-                }}
+                onClick={replaceVideo}
               >
                 {favorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
               </Box>
